@@ -1,0 +1,82 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+-- GUI Setup (Movable)
+local ShootPowerGUI = Instance.new("ScreenGui")
+ShootPowerGUI.Name = "ShootPowerGUI"
+ShootPowerGUI.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 200, 0, 150)
+MainFrame.Position = UDim2.new(0.5, -100, 0.7, -75)
+MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MainFrame.Active = true -- Allows dragging
+MainFrame.Draggable = true -- Makes it movable
+MainFrame.Parent = ShootPowerGUI
+
+local Title = Instance.new("TextLabel")
+Title.Text = "SHOOT POWER"
+Title.Size = UDim2.new(1, 0, 0.2, 0)
+Title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Parent = MainFrame
+
+local SpeedBox = Instance.new("TextBox")
+SpeedBox.PlaceholderText = "Speed (e.g., 100)"
+SpeedBox.Size = UDim2.new(0.8, 0, 0.2, 0)
+SpeedBox.Position = UDim2.new(0.1, 0, 0.3, 0)
+SpeedBox.BackgroundColor3 = Color3.new(1, 1, 1)
+SpeedBox.TextColor3 = Color3.new(0, 0, 0)
+SpeedBox.Parent = MainFrame
+
+local ShootButton = Instance.new("TextButton")
+ShootButton.Text = "SHOOT!"
+ShootButton.Size = UDim2.new(0.8, 0, 0.3, 0)
+ShootButton.Position = UDim2.new(0.1, 0, 0.6, 0)
+ShootButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+ShootButton.TextColor3 = Color3.new(1, 1, 1)
+ShootButton.Parent = MainFrame
+
+-- Shoot Function
+local function ShootBall(speed)
+    local Football = workspace:FindFirstChild("Football") -- Uses your ball name
+    if not Football then
+        warn("Football not found!")
+        return
+    end
+
+    -- Unanchor the ball (if needed)
+    if Football.Anchored then
+        Football.Anchored = false
+    end
+
+    -- Apply velocity in the direction the player is facing
+    local direction = HumanoidRootPart.CFrame.LookVector
+    Football.Velocity = direction * tonumber(speed) or 100
+end
+
+-- Button Click
+ShootButton.MouseButton1Click:Connect(function()
+    local speed = tonumber(SpeedBox.Text)
+    if speed then
+        ShootBall(speed)
+    else
+        warn("Invalid speed! Enter a number.")
+    end
+end)
+
+-- Optional: Close Button
+local CloseButton = Instance.new("TextButton")
+CloseButton.Text = "X"
+CloseButton.Size = UDim2.new(0.1, 0, 0.2, 0)
+CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseButton.Parent = MainFrame
+CloseButton.MouseButton1Click:Connect(function()
+    ShootPowerGUI:Destroy()
+end)
